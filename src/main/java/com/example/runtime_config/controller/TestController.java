@@ -2,10 +2,14 @@ package com.example.runtime_config.controller;
 
 import com.example.runtime_config.config.RefreshableConfig;
 import com.example.runtime_config.service.TestService;
+import java.util.ArrayList;
 import java.util.List;
+import org.springframework.aop.framework.AopProxyUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.cloud.context.config.annotation.RefreshScope;
 import org.springframework.context.ApplicationContext;
+import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -49,6 +53,25 @@ public class TestController {
     @RequestMapping("/set")
     public String setProperty() {
         System.setProperty("property1", "updated_property_1");
+        System.out.println(getBeansWithRefreshScope());
         return "set";
+    }
+
+    private List<String> getBeansWithRefreshScope() {
+        ConfigurableApplicationContext configurableApplicationContext =
+            (ConfigurableApplicationContext) applicationContext;
+
+        List<String> refreshScopedBeans = new ArrayList<>();
+        String[] beanNames = configurableApplicationContext.getBeanDefinitionNames();
+
+        for (String beanName : beanNames) {
+            BeanDefinition beanDefinition = configurableApplicationContext.getBeanFactory().getBeanDefinition(beanName);
+            if ("refresh".equals(beanDefinition.getScope())) {
+                System.out.println(beanDefinition);
+                refreshScopedBeans.add(beanDefinition.getBeanClassName());
+            }
+        }
+
+        return refreshScopedBeans;
     }
 }
