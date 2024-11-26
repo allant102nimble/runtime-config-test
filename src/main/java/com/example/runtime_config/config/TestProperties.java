@@ -9,7 +9,7 @@ import org.springframework.cloud.context.config.annotation.RefreshScope;
 @Getter
 @Setter
 @RefreshScope
-public class TestProperties {
+public class TestProperties implements RefreshableProperties {
 
     String property1;
 

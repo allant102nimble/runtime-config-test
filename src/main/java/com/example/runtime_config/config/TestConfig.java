@@ -39,7 +39,6 @@ public class TestConfig implements RefreshableConfig {
 //        System.out.println(testProperties.getProperty1());
 
         refreshScope.refresh(RandomBean.class);
-        refreshScope.refresh(RandomBean2.class);
     }
 
     public boolean requireRefresh() {
