@@ -36,4 +36,7 @@ public class RandomBean2 implements RefreshableBean {
     public RefreshableProperties getRefreshableProperties() {
         return testProperties;
     }
+    public boolean requireRefresh() {
+        return false;
+    }
 }

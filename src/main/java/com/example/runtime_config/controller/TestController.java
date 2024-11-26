@@ -41,10 +41,10 @@ public class TestController {
         for (RefreshableConfig refreshable : refreshableConfigs) {
             refreshable.refreshBean();
         }
-        for (RefreshableBean bean : refreshableBeans) {
-            refreshScope.refresh(bean.getRefreshableProperties().getClass());
-            refreshScope.refresh(bean.getClass());
-        }
+//        for (RefreshableBean bean : refreshableBeans) {
+//            refreshScope.refresh(bean.getRefreshableProperties().getClass());
+//            refreshScope.refresh(bean.getClass());
+//        }
         return "Refresh triggered";
     }
 
