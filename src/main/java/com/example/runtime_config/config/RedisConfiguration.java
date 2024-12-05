@@ -134,7 +134,7 @@ public class RedisConfiguration {
 //        private static final String SUBSCRIBED_CHANNEL = "test-channel";
 
         public ConfigurationChangeSubscriber() {
-        super(TestMessage.class, NimbleChannel.TEST_CHANNEL.getChannelTopic());
+            super(NimbleChannel.TEST_CHANNEL.getChannelTopic());
         }
 
         @Override

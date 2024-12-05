@@ -3,6 +3,8 @@ package com.example.runtime_config.controller;
 import static com.example.runtime_config.config.RefreshableProperties.DEPENDENT_BEANS;
 
 import com.example.runtime_config.RandomBean;
+import com.example.runtime_config.config.Message;
+import com.example.runtime_config.config.Message.MessageBuilder;
 import com.example.runtime_config.config.RedisConfiguration.RedisPublisher;
 import com.example.runtime_config.config.RefreshableProperties;
 import com.example.runtime_config.service.TestService;
@@ -73,6 +75,10 @@ public class TestController {
 
     @RequestMapping("/publish")
     public String publish() {
+        Message message = MessageBuilder.forType("CHANGE")
+            .withAttribute("configType", "test")
+            .withAttribute("configValue", "hello")
+            .build();
         redisPublisher.publish("test-channel", "{\"configType\": \"test\", \"configValue\": \"hello\"}");
         return "published";
     }
