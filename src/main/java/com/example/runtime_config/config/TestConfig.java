@@ -2,10 +2,15 @@ package com.example.runtime_config.config;
 
 import com.example.runtime_config.RandomBean;
 import com.example.runtime_config.RandomBean2;
+import java.lang.reflect.Field;
+import java.util.Arrays;
+import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
+import java.util.stream.Collectors;
 import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.cloud.context.config.annotation.RefreshScope;
 import org.springframework.context.ApplicationContext;
@@ -32,15 +37,19 @@ public class TestConfig implements RefreshableConfig {
 
     public void refreshBean() {
         org.springframework.cloud.context.scope.refresh.RefreshScope refreshScope = applicationContext.getBean(org.springframework.cloud.context.scope.refresh.RefreshScope.class);
-        refreshScope.refresh(TestProperties.class);
+        refreshScope.refresh(RandomBean.class);
+        refreshScope.refresh(RandomBean2.class);
+
+//        List<Field> test = Arrays.stream(TestProperties.class.getDeclaredFields()).collect(Collectors.toList());
+//        ConfigurationProperties cp = TestProperties.class.getAnnotation(ConfigurationProperties.class);
+//        String test3 = cp.value();
+//        String test2 = test.getFirst().getName();
 
 //        // how you could update log level here...
 //        TestProperties testProperties = applicationContext.getBean(TestProperties.class);
 //        System.out.println(testProperties.getProperty1());
 
         // order of these calls matter because if one bean is being used and we call refresh, it blocks until it completes.
-        refreshScope.refresh(RandomBean.class);
-        refreshScope.refresh(RandomBean2.class);
 
         // if we dont want one to block the other, we can run in parallel
 //        CompletableFuture<Void> refresh1 = CompletableFuture.runAsync(() -> refreshScope.refresh(RandomBean.class));

@@ -1,10 +1,15 @@
 package com.example.runtime_config.controller;
 
+import com.example.runtime_config.RandomBean;
+import com.example.runtime_config.config.RedisConfiguration.RedisPublisher;
 import com.example.runtime_config.config.RefreshableConfig;
+import com.example.runtime_config.config.RefreshableProperties;
+import com.example.runtime_config.config.TestProperties;
 import com.example.runtime_config.service.TestService;
 import java.util.ArrayList;
 import java.util.List;
 import org.springframework.aop.framework.AopProxyUtils;
+import org.springframework.aop.support.AopUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.cloud.context.config.annotation.RefreshScope;
@@ -24,7 +29,13 @@ public class TestController {
     private ApplicationContext applicationContext;
 
     @Autowired
-    private List<RefreshableConfig> refreshables;
+    private List<RefreshableConfig> refreshableConfigurations;
+
+    @Autowired
+    private List<RefreshableProperties> refreshableProperties;
+
+    @Autowired
+    private RedisPublisher redisPublisher;
 
     @RequestMapping("/")
     public String home() {
@@ -33,10 +44,16 @@ public class TestController {
 
     @RequestMapping("/refresh")
     public String refreshConfig() {
-        for (RefreshableConfig refreshable : refreshables) {
-//            if (refreshable.requireRefresh())
-            refreshable.refreshBean();
+        for (RefreshableProperties refreshableProperties : refreshableProperties) {
+            org.springframework.cloud.context.scope.refresh.RefreshScope refreshScope = applicationContext.getBean(org.springframework.cloud.context.scope.refresh.RefreshScope.class);
+////            refreshScope.refresh(AopUtils.getTargetClass(refreshableProperties).getName());
+            refreshScope.refresh(refreshableProperties.getClass());
+            refreshScope.refresh(RandomBean.class);
         }
+//        for (RefreshableConfig refreshable : refreshableConfigurations) {
+////            if (refreshable.requireRefresh())
+//            refreshable.refreshBean();
+//        }
         return "Refresh triggered";
     }
 
@@ -52,9 +69,15 @@ public class TestController {
 
     @RequestMapping("/set")
     public String setProperty() {
-        System.setProperty("property1", "updated_property_1");
+        System.setProperty("hello.property1", "updated_property_1");
         System.out.println(getBeansWithRefreshScope());
         return "set";
+    }
+
+    @RequestMapping("/publish")
+    public String publish() {
+        redisPublisher.publish("test-channel", "{\"configType\": \"test\", \"configValue\": \"hello\"}");
+        return "published";
     }
 
     private List<String> getBeansWithRefreshScope() {

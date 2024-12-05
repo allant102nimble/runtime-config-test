@@ -1,1 +1,2 @@
-property1: this_is_property_one
+hello:
+  property1: 1

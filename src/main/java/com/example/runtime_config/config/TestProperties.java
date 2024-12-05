@@ -5,12 +5,16 @@ import lombok.Setter;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.cloud.context.config.annotation.RefreshScope;
 
-@ConfigurationProperties
+@ConfigurationProperties("hello")
 @Getter
 @Setter
 @RefreshScope
-public class TestProperties {
-
+public class TestProperties implements RefreshableProperties {
     String property1;
+
+    @Override
+    public void validate(String key, String value) throws RefreshablePropertyValidationException {
+        return;
+    }
 
 }
