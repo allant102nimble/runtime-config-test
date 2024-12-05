@@ -19,46 +19,20 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 
 @Configuration
-@EnableConfigurationProperties(TestProperties.class)
+@EnableConfigurationProperties(RefreshableProperties.class)
 @AllArgsConstructor
 @ComponentScan("com.example.runtime_config")
-public class TestConfig implements RefreshableConfig {
+public class TestConfig {
 
     @Autowired
     ApplicationContext applicationContext;
 
-    private TestProperties testProperties;
+    private RefreshableProperties refreshableProperties;
 
     @Bean
     @RefreshScope
     public RandomBean randomBean() {
-        return new RandomBean(testProperties.getProperty1());
+        return new RandomBean(refreshableProperties.getProperty1());
     }
 
-    public void refreshBean() {
-        org.springframework.cloud.context.scope.refresh.RefreshScope refreshScope = applicationContext.getBean(org.springframework.cloud.context.scope.refresh.RefreshScope.class);
-        refreshScope.refresh(RandomBean.class);
-        refreshScope.refresh(RandomBean2.class);
-
-//        List<Field> test = Arrays.stream(TestProperties.class.getDeclaredFields()).collect(Collectors.toList());
-//        ConfigurationProperties cp = TestProperties.class.getAnnotation(ConfigurationProperties.class);
-//        String test3 = cp.value();
-//        String test2 = test.getFirst().getName();
-
-//        // how you could update log level here...
-//        TestProperties testProperties = applicationContext.getBean(TestProperties.class);
-//        System.out.println(testProperties.getProperty1());
-
-        // order of these calls matter because if one bean is being used and we call refresh, it blocks until it completes.
-
-        // if we dont want one to block the other, we can run in parallel
-//        CompletableFuture<Void> refresh1 = CompletableFuture.runAsync(() -> refreshScope.refresh(RandomBean.class));
-//        CompletableFuture<Void> refresh2 = CompletableFuture.runAsync(() -> refreshScope.refresh(RandomBean2.class));
-//
-//        CompletableFuture.allOf(refresh1, refresh2).join();
-    }
-
-    public boolean requireRefresh() {
-        return false;
-    }
 }

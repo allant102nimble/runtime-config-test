@@ -1,20 +1,21 @@
 package com.example.runtime_config.controller;
 
+import static com.example.runtime_config.config.RefreshableProperties.DEPENDENT_BEANS;
+
 import com.example.runtime_config.RandomBean;
 import com.example.runtime_config.config.RedisConfiguration.RedisPublisher;
-import com.example.runtime_config.config.RefreshableConfig;
 import com.example.runtime_config.config.RefreshableProperties;
-import com.example.runtime_config.config.TestProperties;
 import com.example.runtime_config.service.TestService;
 import java.util.ArrayList;
 import java.util.List;
-import org.springframework.aop.framework.AopProxyUtils;
-import org.springframework.aop.support.AopUtils;
+import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.BeanDefinition;
+import org.springframework.boot.autoconfigure.data.redis.RedisProperties.Lettuce.Cluster.Refresh;
 import org.springframework.cloud.context.config.annotation.RefreshScope;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ConfigurableApplicationContext;
+import org.springframework.data.util.Pair;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -29,10 +30,7 @@ public class TestController {
     private ApplicationContext applicationContext;
 
     @Autowired
-    private List<RefreshableConfig> refreshableConfigurations;
-
-    @Autowired
-    private List<RefreshableProperties> refreshableProperties;
+    private RefreshableProperties refreshableProperties;
 
     @Autowired
     private RedisPublisher redisPublisher;
@@ -44,16 +42,15 @@ public class TestController {
 
     @RequestMapping("/refresh")
     public String refreshConfig() {
-        for (RefreshableProperties refreshableProperties : refreshableProperties) {
-            org.springframework.cloud.context.scope.refresh.RefreshScope refreshScope = applicationContext.getBean(org.springframework.cloud.context.scope.refresh.RefreshScope.class);
-////            refreshScope.refresh(AopUtils.getTargetClass(refreshableProperties).getName());
-            refreshScope.refresh(refreshableProperties.getClass());
-            refreshScope.refresh(RandomBean.class);
+        org.springframework.cloud.context.scope.refresh.RefreshScope refreshScope = applicationContext.getBean(org.springframework.cloud.context.scope.refresh.RefreshScope.class);
+        refreshScope.refresh(RefreshableProperties.class);
+
+        for (Map.Entry<String, List<Class>> entry : DEPENDENT_BEANS.entrySet()) {
+            for (Class clazz : entry.getValue()) {
+                refreshScope.refresh(clazz);
+            }
         }
-//        for (RefreshableConfig refreshable : refreshableConfigurations) {
-////            if (refreshable.requireRefresh())
-//            refreshable.refreshBean();
-//        }
+
         return "Refresh triggered";
     }
 
