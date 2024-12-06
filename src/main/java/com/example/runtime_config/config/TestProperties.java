@@ -10,7 +10,7 @@ import org.springframework.cloud.context.config.annotation.RefreshScope;
 @Setter
 @RefreshScope
 public class TestProperties implements RefreshableProperties {
-    String property1;
+    Integer property1;
 
     @Override
     public void validate(String key, String value) throws RefreshablePropertyValidationException {

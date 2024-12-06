@@ -44,16 +44,15 @@ public class TestController {
 
     @RequestMapping("/refresh")
     public String refreshConfig() {
-        for (RefreshableProperties refreshableProperties : refreshableProperties) {
+        try {
             org.springframework.cloud.context.scope.refresh.RefreshScope refreshScope = applicationContext.getBean(org.springframework.cloud.context.scope.refresh.RefreshScope.class);
-////            refreshScope.refresh(AopUtils.getTargetClass(refreshableProperties).getName());
-            refreshScope.refresh(refreshableProperties.getClass());
+            refreshScope.refresh(refreshableProperties.getFirst().getClass());
             refreshScope.refresh(RandomBean.class);
+
+            applicationContext.getBean(RandomBean.class);
+        } catch (Exception e) {
+            System.out.println(e);
         }
-//        for (RefreshableConfig refreshable : refreshableConfigurations) {
-////            if (refreshable.requireRefresh())
-//            refreshable.refreshBean();
-//        }
         return "Refresh triggered";
     }
 
@@ -70,9 +69,18 @@ public class TestController {
     @RequestMapping("/set")
     public String setProperty() {
         System.setProperty("hello.property1", "updated_property_1");
+//        System.out.println(getBeansWithRefreshScope());
+        return "set";
+    }
+
+    @RequestMapping("/set2")
+    public String setProperty2() {
+        System.setProperty("hello.property1", "100");
         System.out.println(getBeansWithRefreshScope());
         return "set";
     }
+
+
 
     @RequestMapping("/publish")
     public String publish() {

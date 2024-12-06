@@ -18,8 +18,6 @@ public class TestService {
     private RandomBean2 randomBean2;
 
     public String doSomeWork() {
-        originalValues = ImmutableMap.of("hi", "bye");
-        System.out.println(originalValues.get("hi"));
         return randomBean.hello();
     }
 

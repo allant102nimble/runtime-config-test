@@ -17,7 +17,7 @@ public class RandomBean2 {
 
     @Autowired
     private ApplicationContext applicationContext;
-    private String property;
+    private Integer property;
 
 
     public RandomBean2(TestProperties testProperties) throws BindException {
@@ -26,14 +26,14 @@ public class RandomBean2 {
     }
 
     public String bye() {
-        String[] dependentBeanNames = ((ConfigurableApplicationContext)applicationContext).getBeanFactory().getDependenciesForBean(TestProperties.class.getName());
-        System.out.println(dependentBeanNames);
-        try{
-            Thread.sleep(3000);
-        } catch (Exception e) {
-
-        }
-        System.out.println(randomBean.hello());
+//        String[] dependentBeanNames = ((ConfigurableApplicationContext)applicationContext).getBeanFactory().getDependenciesForBean(TestProperties.class.getName());
+////        System.out.println(dependentBeanNames);
+////        try{
+////            Thread.sleep(3000);
+////        } catch (Exception e) {
+////
+////        }
+//        System.out.println(randomBean.hello());
         return "RandomBean2: Property " + property;
     }
 }

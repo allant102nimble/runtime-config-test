@@ -5,6 +5,7 @@ import com.example.runtime_config.RandomBean2;
 import java.lang.reflect.Field;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Random;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
 import java.util.stream.Collectors;
@@ -17,6 +18,9 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Fallback;
+import org.springframework.context.annotation.Lazy;
+import org.springframework.context.annotation.Primary;
 
 @Configuration
 @EnableConfigurationProperties(TestProperties.class)
@@ -29,14 +33,29 @@ public class TestConfig implements RefreshableConfig {
 
     private TestProperties testProperties;
 
+
     @Bean
     @RefreshScope
     public RandomBean randomBean() {
-        return new RandomBean(testProperties.getProperty1());
+        try {
+            return new RandomBean(testProperties.getProperty1());
+        } catch (Exception e) {
+            return fallbackRandomBean();
+        }
+    }
+
+    // problem with this is that once the engineer resets the config value back to normal, there are two
+    // randombeans
+    @Bean
+    @Fallback
+    @Lazy
+    public RandomBean fallbackRandomBean() {
+        return new RandomBean(123);
     }
 
     public void refreshBean() {
         org.springframework.cloud.context.scope.refresh.RefreshScope refreshScope = applicationContext.getBean(org.springframework.cloud.context.scope.refresh.RefreshScope.class);
+        refreshScope.refresh(TestProperties.class);
         refreshScope.refresh(RandomBean.class);
         refreshScope.refresh(RandomBean2.class);
 
